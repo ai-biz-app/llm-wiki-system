@@ -1,0 +1,436 @@
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --text-muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-hover: #79c0ff;
+  --success: #3fb950;
+  --warning: #d29922;
+  --danger: #f85149;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav-brand { font-weight: 700; font-size: 1.25rem; }
+
+.nav-links { display: flex; gap: 1.5rem; }
+
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.page.hidden { display: none; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+input[type="url"], input[type="file"], input[type="text"] {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+input[type="file"] { display: none; }
+
+button {
+  margin-top: 0.75rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover { background: var(--accent-hover); }
+button:disabled { background: var(--text-muted); cursor: not-allowed; }
+
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.dropzone:hover, .dropzone.dragover {
+  border-color: var(--accent);
+  background: rgba(88, 166, 255, 0.05);
+}
+
+.status {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  min-height: 1.5rem;
+}
+
+.status.success { color: var(--success); }
+.status.running { color: var(--warning); }
+.status.error { color: var(--danger); }
+
+.wiki-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+.wiki-content h1, .wiki-content h2, .wiki-content h3 {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3rem;
+}
+
+.wiki-content a { color: var(--accent); }
+
+.wiki-content pre {
+  background: var(--bg);
+  padding: 1rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.wiki-content code {
+  background: var(--bg);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.pagination button {
+  margin-top: 0;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.job-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.job-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.job-item .job-title { font-weight: 500; }
+.job-item .job-status {
+  font-size: 0.85rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--border);
+}
+.job-item .job-status.done { background: rgba(63, 185, 80, 0.15); color: var(--success); }
+.job-item .job-status.failed { background: rgba(248, 81, 73, 0.15); color: var(--danger); }
+.job-item .job-status.running { background: rgba(210, 153, 34, 0.15); color: var(--warning); }
+.job-item .job-status.queued { background: rgba(139, 148, 158, 0.15); color: var(--text-muted); }
+
+/* Job Filters */
+.job-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.job-filter-input,
+.job-filter-select {
+  padding: 0.4rem 0.6rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.job-filter-input {
+  min-width: 180px;
+  flex: 1;
+}
+
+.job-filter-select {
+  min-width: 120px;
+}
+
+.job-filter-btn {
+  margin-top: 0;
+  padding: 0.4rem 0.8rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.job-filter-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Job item with info layout */
+.job-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.job-item .job-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.job-item .job-title {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.job-item .job-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.job-item .job-source {
+  font-size: 0.78rem;
+  color: var(--accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Wiki Browser Layout */
+.wiki-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.wiki-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+.wiki-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.wiki-search {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.wiki-search input {
+  flex: 1;
+}
+
+.wiki-search button {
+  margin-top: 0;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.wiki-search-results {
+  margin-bottom: 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+}
+
+.wiki-search-results.hidden { display: none; }
+
+.search-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.search-item {
+  display: block;
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+}
+
+.search-item:hover {
+  background: rgba(88, 166, 255, 0.08);
+}
+
+.search-title {
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.2rem;
+}
+
+.search-snippet {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.wiki-tree details {
+  margin-bottom: 0.3rem;
+}
+
+.wiki-tree summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.3rem 0;
+  color: var(--text);
+}
+
+.wiki-tree summary:hover {
+  color: var(--accent);
+}
+
+.page-list {
+  list-style: none;
+  margin: 0;
+  padding-left: 0.75rem;
+}
+
+.page-list li {
+  margin: 0.15rem 0;
+}
+
+.page-link {
+  display: block;
+  padding: 0.25rem 0.4rem;
+  border-radius: 4px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+
+.page-link:hover, .page-link.active {
+  color: var(--text);
+  background: rgba(88, 166, 255, 0.1);
+}
+
+.page-link.active {
+  font-weight: 600;
+}
+
+.wiki-breadcrumbs {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.wiki-breadcrumbs a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.wiki-breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+.bc-sep { margin: 0 0.3rem; color: var(--border); }
+.bc-current { color: var(--text); font-weight: 500; }
+
+.muted { color: var(--text-muted); }
+.error { color: var(--danger); }
+
+/* Responsive */
+@media (max-width: 800px) {
+  .wiki-layout {
+    flex-direction: column;
+  }
+  .wiki-sidebar {
+    width: 100%;
+    position: static;
+    max-height: none;
+  }
+}

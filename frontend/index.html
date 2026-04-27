@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Wiki</title>
+  <link rel="stylesheet" href="/static/css/style.css?v=4">
+  <link rel="stylesheet" href="/static/css/graph.css?v=2">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">LLM Wiki</div>
+    <div class="nav-links">
+      <a href="/" class="nav-link active" data-page="ingest">Ingest</a>
+      <a href="/wiki/" class="nav-link" data-page="wiki">Wiki</a>
+      <a href="/" class="nav-link" data-page="graph">Graph</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <!-- Ingest Page -->
+    <section id="page-ingest" class="page">
+      <h1>Ingest New Source</h1>
+
+      <div class="card">
+        <h2>From URL</h2>
+        <form id="url-form">
+          <input type="url" id="url-input" placeholder="https://example.com/article" required />
+          <button type="submit">Ingest URL</button>
+        </form>
+        <div id="url-status" class="status"></div>
+      </div>
+
+      <div class="card">
+        <h2>From File</h2>
+        <div class="dropzone" id="dropzone">
+          <p>Drop PDF, TXT, MD, or DOCX here</p>
+          <p>or click to browse</p>
+          <input type="file" id="file-input" accept=".pdf,.txt,.md,.docx" />
+        </div>
+        <button id="file-submit" disabled>Upload & Ingest</button>
+        <div id="file-status" class="status"></div>
+      </div>
+
+      <div class="card">
+        <h2>Recent Jobs</h2>
+        <div class="job-filters">
+          <input type="text" id="job-filter-name" placeholder="Filter by job name..." class="job-filter-input" />
+          <input type="date" id="job-filter-date" class="job-filter-input" />
+          <select id="job-filter-status" class="job-filter-select">
+            <option value="">All Statuses</option>
+            <option value="running">Running</option>
+            <option value="done">Done</option>
+            <option value="failed">Failed</option>
+          </select>
+          <button id="job-filter-clear" class="job-filter-btn">Clear</button>
+        </div>
+        <div id="recent-jobs">Loading...</div>
+      </div>
+    </section>
+
+    <!-- Overview Page -->
+    <section id="page-overview" class="page hidden">
+      <h1>Overview</h1>
+      <div id="overview-content" class="wiki-content">Loading...</div>
+    </section>
+
+    <!-- Log Page -->
+    <section id="page-log" class="page hidden">
+      <h1>Log</h1>
+      <div id="log-content" class="wiki-content">Loading...</div>
+      <div id="log-pagination" class="pagination"></div>
+    </section>
+
+    <!-- Wiki Browser Page -->
+    <section id="page-wiki" class="page hidden">
+      <div class="wiki-layout">
+        <aside class="wiki-sidebar">
+          <div class="wiki-search">
+            <input type="text" id="wiki-search-input" placeholder="Search wiki..." />
+            <button id="wiki-search-btn">Search</button>
+          </div>
+          <div id="wiki-search-results" class="wiki-search-results hidden"></div>
+          <div id="wiki-tree" class="wiki-tree">Loading...</div>
+        </aside>
+        <div class="wiki-main">
+          <nav id="wiki-breadcrumbs" class="wiki-breadcrumbs"></nav>
+          <h1 id="wiki-title">Wiki</h1>
+          <div id="wiki-content" class="wiki-content">
+            <p>Select a page from the sidebar, or <a href="/wiki/index">view the index</a>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Graph Visualization Page -->
+    <section id="page-graph" class="page hidden">
+      <h1>Knowledge Graph</h1>
+
+      <!-- Stats Bar -->
+      <div class="graph-stats" id="graph-stats">
+        <div class="graph-stat">
+          <span class="graph-stat-label">Nodes</span>
+          <span class="graph-stat-value" id="stat-nodes">-</span>
+        </div>
+        <div class="graph-stat">
+          <span class="graph-stat-label">Edges</span>
+          <span class="graph-stat-value" id="stat-edges">-</span>
+        </div>
+        <div class="graph-stat">
+          <span class="graph-stat-label">Communities</span>
+          <span class="graph-stat-value" id="stat-communities">-</span>
+        </div>
+        <div class="graph-stat">
+          <span class="graph-stat-label">God Nodes</span>
+          <span class="graph-stat-value" id="stat-god-nodes">-</span>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="graph-legend">
+        <div class="legend-item">
+          <span class="legend-color extracted"></span>
+          <span>Extracted (verified)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color inferred"></span>
+          <span>Inferred (probable)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color ambiguous"></span>
+          <span>Ambiguous (needs review)</span>
+        </div>
+      </div>
+
+      <div class="graph-layout">
+        <!-- Graph Visualization -->
+        <div class="graph-viz-container">
+          <div id="graph-viz">
+            <div class="loading">Loading graph visualization...</div>
+          </div>
+        </div>
+
+        <!-- Sidebar Controls -->
+        <div class="graph-sidebar">
+          <!-- Search -->
+          <div class="graph-controls">
+            <h4>Search</h4>
+            <div class="graph-search-box">
+              <input type="text" id="graph-search" placeholder="Find nodes...">
+              <button id="graph-search-btn" class="action-btn">Find</button>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="graph-controls">
+            <h4>Filters</h4>
+            <select id="community-filter" class="graph-select">
+              <option value="">All Communities</option>
+            </select>
+            <select id="confidence-filter" class="graph-select">
+              <option value="">All Confidences</option>
+              <option value="EXTRACTED">Extracted Only</option>
+              <option value="INFERRED">Inferred Only</option>
+              <option value="AMBIGUOUS">Ambiguous Only</option>
+            </select>
+          </div>
+
+          <!-- Path Finding -->
+          <div class="graph-controls">
+            <h4>Find Path</h4>
+            <div class="path-inputs">
+              <input type="text" id="path-from" placeholder="From node...">
+              <input type="text" id="path-to" placeholder="To node...">
+            </div>
+            <button id="path-button" class="action-btn">
+              Find Path
+            </button>
+            <div id="path-result" class="path-result"></div>
+          </div>
+
+          <!-- Natural Language Query -->
+          <div class="graph-controls">
+            <h4>Ask the Graph</h4>
+            <div class="graph-query-box">
+              <input type="text" id="graph-query" placeholder="e.g., 'what connects X to Y?'">
+            </div>
+            <button id="query-button" class="action-btn">Ask</button>
+            <div id="query-result" class="query-result"></div>
+          </div>
+
+          <!-- Node Details -->
+          <div id="graph-node-details"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/js/app.js?v=4"></script>
+  <script src="/static/js/graph.js?v=2"></script>
+</body>
+</html>

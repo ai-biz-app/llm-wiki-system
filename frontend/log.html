@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Wiki — Log</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="brand">LLM Wiki</a>
+    <div class="links">
+      <a href="/overview.html">Overview</a>
+      <a href="/log.html" class="active">Log</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div id="content" class="wiki-content">
+      <p class="loading">Loading log...</p>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    let page = parseInt(params.get('page')) || 1;
+
+    async function loadLog() {
+      const contentEl = document.getElementById('content');
+      const paginationEl = document.getElementById('pagination');
+      try {
+        const res = await fetch(`/api/log?page=${page}&per_page=50`);
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        contentEl.innerHTML = data.html;
+
+        let pagesHtml = '';
+        if (data.pages > 1) {
+          for (let i = 1; i <= data.pages; i++) {
+            if (i === data.page) {
+              pagesHtml += `<span class="page active">${i}</span>`;
+            } else {
+              pagesHtml += `<a class="page" href="?page=${i}">${i}</a>`;
+            }
+          }
+        }
+        paginationEl.innerHTML = pagesHtml;
+      } catch (e) {
+        contentEl.innerHTML = `<p class="error">Error: ${e.message}</p>`;
+      }
+    }
+    loadLog();
+  </script>
+</body>
+</html>

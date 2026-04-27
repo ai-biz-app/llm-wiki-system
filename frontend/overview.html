@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Wiki — Overview</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="brand">LLM Wiki</a>
+    <div class="links">
+      <a href="/overview.html" class="active">Overview</a>
+      <a href="/log.html">Log</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div id="content" class="wiki-content">
+      <p class="loading">Loading overview...</p>
+    </div>
+    <p class="meta" id="updated"></p>
+  </main>
+
+  <script>
+    async function loadOverview() {
+      const contentEl = document.getElementById('content');
+      const updatedEl = document.getElementById('updated');
+      try {
+        const res = await fetch('/api/overview');
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        contentEl.innerHTML = data.html;
+        updatedEl.textContent = data.updated ? `Last updated: ${data.updated}` : '';
+      } catch (e) {
+        contentEl.innerHTML = `<p class="error">Error: ${e.message}</p>`;
+      }
+    }
+    loadOverview();
+  </script>
+</body>
+</html>
