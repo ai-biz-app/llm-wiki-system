@@ -38,6 +38,7 @@
       if (e.key === 'Enter') searchNode();
     });
     document.getElementById('confidence-filter')?.addEventListener('change', filterGraph);
+    document.getElementById('good-nodes-only')?.addEventListener('change', filterGraph);
     document.getElementById('path-button')?.addEventListener('click', findPath);
     document.getElementById('query-button')?.addEventListener('click', queryGraph);
     document.getElementById('graph-query')?.addEventListener('keypress', (e) => {
@@ -236,12 +237,30 @@
 
     const community = document.getElementById('community-filter').value;
     const confidence = document.getElementById('confidence-filter').value;
+    const goodOnly = document.getElementById('good-nodes-only')?.checked;
 
     nodeElements.classed('dimmed', d => {
       let hidden = false;
+
+      // Community filter
       if (community && String(d.community ?? d.attributes?.community) !== community) {
         hidden = true;
       }
+
+      // Confidence filter
+      const nodeConf = (d.confidence ?? d.attributes?.confidence ?? 'INFERRED').toUpperCase();
+      if (confidence && nodeConf !== confidence) {
+        hidden = true;
+      }
+
+      // Good nodes only: EXTRACTED confidence AND has connections (degree > 0)
+      if (goodOnly) {
+        const degree = d.degree ?? d.attributes?.degree ?? 0;
+        if (nodeConf !== 'EXTRACTED' || degree === 0) {
+          hidden = true;
+        }
+      }
+
       return hidden;
     });
 
@@ -284,12 +303,32 @@
         );
       }
     } else if (matchingNodes.length > 1) {
-      // Multiple matches - clear details panel
+      // Multiple matches - show clickable list
       const panel = document.getElementById('graph-node-details');
+      const listHtml = matchingNodes.map(n => {
+        const label = n.label || n.id;
+        const conf = (n.confidence ?? n.attributes?.confidence ?? 'UNKNOWN').toUpperCase();
+        const degree = n.degree ?? n.attributes?.degree ?? 0;
+        return `<li class="search-match-item" data-node-id="${n.id}">
+          <span class="match-label">${label}</span>
+          <span class="match-meta">${conf} · ${degree} conn</span>
+        </li>`;
+      }).join('');
       panel.innerHTML = `<div class="node-details">
-        <p class="no-connections">${matchingNodes.length} nodes found. Click one to view details.</p>
+        <h3>${matchingNodes.length} nodes found</h3>
+        <p class="no-connections">Click a node below to view details.</p>
+        <ul class="search-match-list">${listHtml}</ul>
       </div>`;
       panel.classList.add('has-content');
+
+      // Wire up click handlers
+      panel.querySelectorAll('.search-match-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const nodeId = item.getAttribute('data-node-id');
+          const node = graphData.nodes.find(n => n.id === nodeId);
+          if (node) showNodeDetails(node);
+        });
+      });
     }
 
     if (matchingNodes.length > 0 && simulation) {

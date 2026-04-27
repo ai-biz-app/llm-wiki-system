@@ -143,53 +143,63 @@
           </div>
         </div>
 
-        <!-- Sidebar Controls -->
+        <!-- Sidebar -->
         <div class="graph-sidebar">
           <!-- Search -->
-          <div class="graph-controls">
-            <h4>Search</h4>
-            <div class="graph-search-box">
-              <input type="text" id="graph-search" placeholder="Find nodes...">
-              <button id="graph-search-btn" class="action-btn">Find</button>
+          <details class="graph-panel" open>
+            <summary class="graph-panel-summary">Search</summary>
+            <div class="graph-panel-body">
+              <div class="graph-search-box">
+                <input type="text" id="graph-search" placeholder="Find nodes...">
+                <button id="graph-search-btn" class="action-btn">Find</button>
+              </div>
             </div>
-          </div>
+          </details>
 
           <!-- Filters -->
-          <div class="graph-controls">
-            <h4>Filters</h4>
-            <select id="community-filter" class="graph-select">
-              <option value="">All Communities</option>
-            </select>
-            <select id="confidence-filter" class="graph-select">
-              <option value="">All Confidences</option>
-              <option value="EXTRACTED">Extracted Only</option>
-              <option value="INFERRED">Inferred Only</option>
-              <option value="AMBIGUOUS">Ambiguous Only</option>
-            </select>
-          </div>
+          <details class="graph-panel" open>
+            <summary class="graph-panel-summary">Filters</summary>
+            <div class="graph-panel-body">
+              <select id="community-filter" class="graph-select">
+                <option value="">All Communities</option>
+              </select>
+              <select id="confidence-filter" class="graph-select">
+                <option value="">All Confidences</option>
+                <option value="EXTRACTED">Extracted Only</option>
+                <option value="INFERRED">Inferred Only</option>
+                <option value="AMBIGUOUS">Ambiguous Only</option>
+              </select>
+              <label class="good-only-check">
+                <input type="checkbox" id="good-nodes-only">
+                <span>Good nodes only (connected + extracted)</span>
+              </label>
+            </div>
+          </details>
 
           <!-- Path Finding -->
-          <div class="graph-controls">
-            <h4>Find Path</h4>
-            <div class="path-inputs">
-              <input type="text" id="path-from" placeholder="From node...">
-              <input type="text" id="path-to" placeholder="To node...">
+          <details class="graph-panel">
+            <summary class="graph-panel-summary">Find Path</summary>
+            <div class="graph-panel-body">
+              <div class="path-inputs">
+                <input type="text" id="path-from" placeholder="From node...">
+                <input type="text" id="path-to" placeholder="To node...">
+              </div>
+              <button id="path-button" class="action-btn">Find Path</button>
+              <div id="path-result" class="path-result"></div>
             </div>
-            <button id="path-button" class="action-btn">
-              Find Path
-            </button>
-            <div id="path-result" class="path-result"></div>
-          </div>
+          </details>
 
           <!-- Natural Language Query -->
-          <div class="graph-controls">
-            <h4>Ask the Graph</h4>
-            <div class="graph-query-box">
-              <input type="text" id="graph-query" placeholder="e.g., 'what connects X to Y?'">
+          <details class="graph-panel">
+            <summary class="graph-panel-summary">Ask the Graph</summary>
+            <div class="graph-panel-body">
+              <div class="graph-query-box">
+                <input type="text" id="graph-query" placeholder="e.g., 'what connects X to Y?'">
+              </div>
+              <button id="query-button" class="action-btn">Ask</button>
+              <div id="query-result" class="query-result"></div>
             </div>
-            <button id="query-button" class="action-btn">Ask</button>
-            <div id="query-result" class="query-result"></div>
-          </div>
+          </details>
 
           <!-- Node Details -->
           <div id="graph-node-details"></div>
@@ -198,7 +208,7 @@
     </section>
   </main>
 
-  <script src="/static/js/app.js?v=4"></script>
-  <script src="/static/js/graph.js?v=2"></script>
+  <script src="/static/js/app.js?v=5"></script>
+  <script src="/static/js/graph.js?v=3"></script>
 </body>
 </html>
