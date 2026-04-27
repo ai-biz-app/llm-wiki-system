@@ -238,7 +238,26 @@
     const community = document.getElementById('community-filter').value;
     const confidence = document.getElementById('confidence-filter').value;
     const goodOnly = document.getElementById('good-nodes-only')?.checked;
+    const edgeKey = graphData.links ? 'links' : 'edges';
+    const edges = graphData[edgeKey] || [];
 
+    // Step 1: Determine which edges match the confidence filter (case-insensitive)
+    const visibleEdges = edges.filter(e => {
+      if (!confidence) return true;
+      const edgeConf = (e.confidence || 'INFERRED').toString().toUpperCase();
+      return edgeConf === confidence;
+    });
+
+    // Step 2: Collect node IDs that participate in at least one visible edge
+    const visibleNodeIds = new Set();
+    visibleEdges.forEach(e => {
+      const srcId = typeof e.source === 'object' ? e.source.id : e.source;
+      const tgtId = typeof e.target === 'object' ? e.target.id : e.target;
+      if (srcId) visibleNodeIds.add(srcId);
+      if (tgtId) visibleNodeIds.add(tgtId);
+    });
+
+    // Step 3: Filter nodes — must match community AND have a visible edge (if confidence active)
     nodeElements.classed('dimmed', d => {
       let hidden = false;
 
@@ -247,14 +266,14 @@
         hidden = true;
       }
 
-      // Confidence filter
-      const nodeConf = (d.confidence ?? d.attributes?.confidence ?? 'INFERRED').toUpperCase();
-      if (confidence && nodeConf !== confidence) {
+      // Confidence filter: show only nodes connected by at least one visible edge
+      if (confidence && !visibleNodeIds.has(d.id)) {
         hidden = true;
       }
 
       // Good nodes only: EXTRACTED confidence AND has connections (degree > 0)
       if (goodOnly) {
+        const nodeConf = (d.confidence ?? d.attributes?.confidence ?? 'INFERRED').toString().toUpperCase();
         const degree = d.degree ?? d.attributes?.degree ?? 0;
         if (nodeConf !== 'EXTRACTED' || degree === 0) {
           hidden = true;
@@ -264,9 +283,11 @@
       return hidden;
     });
 
+    // Step 4: Filter edges by confidence (case-insensitive)
     linkElements.classed('dimmed', d => {
       if (!confidence) return false;
-      return (d.confidence || 'INFERRED') !== confidence;
+      const edgeConf = (d.confidence || 'INFERRED').toString().toUpperCase();
+      return edgeConf !== confidence;
     });
   }
 
