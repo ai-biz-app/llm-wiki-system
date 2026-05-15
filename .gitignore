@@ -45,13 +45,13 @@ venv.bak/
 jobs/queue.jsonl
 jobs/results/
 backend/jobs/queue.jsonl
-backend/jobs/results/*.json
+backend/jobs/results/
 .jobs/
 .pytest_cache/
 *.backup.*
 
+# Tests (not tracked in repo)
+tests/
+
 # Keep directory structure
-!jobs/.gitkeep
-!jobs/results/.gitkeep
 !backend/jobs/.gitkeep
-!backend/jobs/results/.gitkeep

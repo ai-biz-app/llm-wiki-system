@@ -56,6 +56,7 @@ The wiki is not a database the LLM queries. **The wiki IS the product.** The LLM
 │  │  • Ingestion (LLM synthesis pipeline with cross-linking)              ││
 │  │  • Markdown Rendering (Obsidian-compatible wiki links)                ││
 │  │  • Graphify Integration (Knowledge graph generation)                  ││
+│  │  • Graph Rebuild Scheduler (Debounced auto + manual + cron)           ││
 │  │  • Graph Sync (Cross-reference injection into wiki pages)             ││
 │  └─────────────────────────────────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -123,11 +124,11 @@ When you submit a URL or upload a file, this happens:
    Write synthesized pages to wiki/{entities,concepts,analyses}/
    Update index.md, log.md, overview.md
 
-5. GRAPH
-   Trigger Graphify rebuild (incremental)
-   Extract entities/relationships from all wiki pages
-   Build network graph with confidence scoring
-   Generate Obsidian-compatible export
+5. GRAPH (Hybrid Rebuild)
+   Auto: Debounced rebuild 5 min after last ingestion (batches rapid uploads)
+   Manual: Click "Rebuild Graph" in the sidebar for immediate update
+   Cron: Nightly safety-net rebuild at 3 AM UTC
+   All modes use Graphify's SHA256 cache for incremental processing
 ```
 
 ---
@@ -155,6 +156,7 @@ When you submit a URL or upload a file, this happens:
 - **Node details** — Click any node to see properties, connections, incoming/outgoing relationships
 - **Path finding** — BFS shortest path between two nodes
 - **Natural language queries** — Ask the graph questions in plain English
+- **Hybrid graph rebuild** — Debounced auto-rebuild (5 min) + manual trigger + nightly cron safety net
 
 ### Design
 - **Linear-inspired UI** — Dark-mode-native design system with Inter typography, semi-transparent borders, and indigo-violet accents
@@ -264,6 +266,8 @@ API keys are read from `~/.hermes/.env` (outside the app directory) and never co
 | `/api/graph/stats` | GET | Node/edge/community counts |
 | `/api/graph/full` | GET | Complete graph JSON for D3 |
 | `/api/graph/query?q=...` | GET | Natural language graph query |
+| `/api/graph/rebuild` | POST | Trigger immediate graph rebuild |
+| `/api/graph/rebuild/status` | GET | Get current rebuild status |
 
 ---
 
@@ -278,6 +282,20 @@ The knowledge graph uses a three-tier confidence system:
 | **AMBIGUOUS** | Red | Uncertain — needs human review |
 
 The "Good nodes only" filter shows only **EXTRACTED** nodes that have at least one connection, filtering out isolated or uncertain entities.
+
+---
+
+## Graph Rebuild Scheduler
+
+The system uses a **hybrid three-tier approach** to keep the knowledge graph synchronized with the wiki:
+
+| Trigger | When | Use Case |
+|---------|------|----------|
+| **Auto (debounced)** | 5 minutes after the last ingestion completes | Batches rapid uploads so 10 ingestions = 1 rebuild |
+| **Manual** | On-demand via "Rebuild Graph" button | User wants to see new content in the graph immediately |
+| **Cron (nightly)** | 3:00 AM UTC daily | Safety net for any changes that slipped through |
+
+All rebuilds use **incremental processing** — Graphify's SHA256 cache ensures only changed files are re-processed, making rebuilds fast after the initial run.
 
 ---
 
