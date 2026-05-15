@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 # Import services
 from backend.services.graphify import GraphifyService
 from backend.services.graph_sync import GraphSyncService
+from backend.services.graph_rebuild import get_graph_rebuild_scheduler
 
 router = APIRouter(prefix="/api/graph", tags=["graph"])
 
@@ -139,3 +140,24 @@ async def get_graph_report():
         raise HTTPException(status_code=404, detail="No graph report available")
 
     return {"report": report}
+
+
+@router.post("/rebuild")
+async def rebuild_graph():
+    """Trigger an immediate graph rebuild."""
+    scheduler = get_graph_rebuild_scheduler()
+    if not scheduler:
+        raise HTTPException(status_code=503, detail="Graph rebuild scheduler not initialized")
+
+    status = await scheduler.rebuild_now()
+    return status
+
+
+@router.get("/rebuild/status")
+async def get_rebuild_status():
+    """Get the current graph rebuild status."""
+    scheduler = get_graph_rebuild_scheduler()
+    if not scheduler:
+        raise HTTPException(status_code=503, detail="Graph rebuild scheduler not initialized")
+
+    return scheduler.status

@@ -12,6 +12,7 @@ from backend.jobs.worker import JobQueue
 
 from backend.services.graphify import init_graphify_service
 from backend.services.graph_sync import init_graph_sync_service
+from backend.services.graph_rebuild import init_graph_rebuild_scheduler
 from backend.config import settings
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,10 @@ async def lifespan(app: FastAPI):
                 wiki_dir=Path(settings.wiki_path),
                 graphify_output_dir=graphify_output,
             )
+
+            # Initialize graph rebuild scheduler
+            init_graph_rebuild_scheduler(debounce_seconds=300)
+            logger.info("Graph rebuild scheduler initialized (5 min debounce)")
 
             # Set for routes
             set_graph_services(graphify_service, graph_sync_service)

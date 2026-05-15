@@ -44,6 +44,12 @@
     document.getElementById('graph-query')?.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') queryGraph();
     });
+
+    // Rebuild graph button
+    document.getElementById('rebuild-graph-btn')?.addEventListener('click', rebuildGraph);
+    // Poll rebuild status every 5s
+    setInterval(pollRebuildStatus, 5000);
+    pollRebuildStatus();
   }
 
   function showPage(pageId) {
@@ -537,6 +543,58 @@
       resultDiv.textContent = data.result || 'No results';
     } catch (err) {
       resultDiv.textContent = `Error: ${err.message}`;
+    }
+  }
+
+  async function rebuildGraph() {
+    const btn = document.getElementById('rebuild-graph-btn');
+    const statusDiv = document.getElementById('rebuild-status');
+    if (!btn || !statusDiv) return;
+
+    btn.disabled = true;
+    statusDiv.textContent = 'Starting rebuild...';
+
+    try {
+      const res = await fetch('/api/graph/rebuild', { method: 'POST' });
+      if (!res.ok) throw new Error('Rebuild request failed');
+      const data = await res.json();
+      statusDiv.textContent = data.message || 'Rebuild started';
+    } catch (err) {
+      statusDiv.textContent = `Error: ${err.message}`;
+      btn.disabled = false;
+    }
+  }
+
+  async function pollRebuildStatus() {
+    const btn = document.getElementById('rebuild-graph-btn');
+    const statusDiv = document.getElementById('rebuild-status');
+    if (!btn || !statusDiv) return;
+
+    try {
+      const res = await fetch('/api/graph/rebuild/status');
+      if (!res.ok) return;
+      const data = await res.json();
+
+      if (data.status === 'running') {
+        btn.disabled = true;
+        statusDiv.textContent = data.message || 'Rebuilding...';
+      } else if (data.status === 'pending') {
+        btn.disabled = true;
+        statusDiv.textContent = data.message || 'Rebuild scheduled';
+      } else if (data.status === 'failed') {
+        btn.disabled = false;
+        statusDiv.textContent = 'Failed: ' + (data.message || 'Unknown error');
+      } else {
+        btn.disabled = false;
+        if (data.last_rebuild) {
+          const d = new Date(data.last_rebuild);
+          statusDiv.textContent = 'Last rebuild: ' + d.toLocaleString();
+        } else {
+          statusDiv.textContent = '';
+        }
+      }
+    } catch (err) {
+      // Silently ignore polling errors
     }
   }
 

@@ -10,6 +10,7 @@ from backend.config import settings
 from backend.services.file_storage import save_uploaded_file, save_text_as_md, url_to_filename, ensure_wiki_dirs
 from backend.services import extraction
 from backend.services import ingestion
+from backend.services.graph_rebuild import get_graph_rebuild_scheduler
 
 
 class JobQueue:
@@ -106,6 +107,10 @@ class JobQueue:
                     job_id, "done", f"Ingestion complete: {meta['title']}",
                     result={"saved_to": str(raw_path), "slug": slug, "type": "url", "title": meta["title"]}
                 )
+                # Schedule debounced graph rebuild
+                scheduler = get_graph_rebuild_scheduler()
+                if scheduler:
+                    await scheduler.schedule_rebuild()
 
             elif job_type == "upload":
                 filename = payload["filename"]
@@ -133,6 +138,10 @@ class JobQueue:
                     job_id, "done", f"Ingestion complete: {meta['title']}",
                     result={"saved_to": str(raw_path), "slug": slug, "type": "upload", "title": meta["title"]}
                 )
+                # Schedule debounced graph rebuild
+                scheduler = get_graph_rebuild_scheduler()
+                if scheduler:
+                    await scheduler.schedule_rebuild()
 
             else:
                 await self._update_job(job_id, "failed", f"Unknown job type: {job_type}")

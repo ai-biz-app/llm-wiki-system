@@ -570,6 +570,15 @@
   padding: 1rem 0;
 }
 
+/* Rebuild status */
+.rebuild-status {
+  margin-top: 0.5rem;
+  font-size: 12px;
+  color: var(--text-muted);
+  min-height: 1.25rem;
+  line-height: 1.4;
+}
+
 /* Search match list in node details */
 .search-match-list {
   list-style: none;
